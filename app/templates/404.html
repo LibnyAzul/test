@@ -1,0 +1,17 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="colM">
+        <h1>Page Not Found</h1>
+        <p>The requested page could not be found.</p>
+    </div>
+{% endblock %}

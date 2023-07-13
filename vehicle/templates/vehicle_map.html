@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vehicle Map</title>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="robots" content="NONE,NOARCHIVE">
+
+    <link rel="stylesheet" href="/static/admin/css/base.css">
+    <link rel="stylesheet" href="/static/admin/css/dark_mode.css">
+    <link rel="stylesheet" href="/static/admin/css/nav_sidebar.css">
+    <link rel="stylesheet" href="/static/admin/css/changelists.css">
+    <link rel="stylesheet" href="/static/admin/css/responsive.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="true">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="true">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Mulish:wght@200;300;400;500;600;700;800;900&amp;display=swa">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Mulish:wght@200;300;400;500;600;700;800;900&amp;display=swa">
+
+    <script src="/static/admin/js/theme.js" defer=""></script>
+    <script src="/static/admin/js/nav_sidebar.js" defer=""></script>
+    <script src="/admin/jsi18n/"></script>
+    <script src="/static/admin/js/vendor/jquery/jquery.js"></script>
+    <script src="/static/admin/js/jquery.init.js"></script>
+    <script src="/static/admin/js/core.js"></script>
+    <script src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+    <script src="/static/admin/js/actions.js"></script>
+    <script src="/static/admin/js/urlify.js"></script>
+    <script src="/static/admin/js/prepopulate.js"></script>
+    <script src="/static/admin/js/vendor/xregexp/xregexp.js"></script>
+    <script src="/static/admin/js/filters.js" defer=""></script>
+    <style>undefined</style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+    <script>
+        function initMap() {
+            var map = null
+            function cleanMap() {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: {lat: 20.6738673, lng: -103.3766127}  // Coordenadas iniciales
+                });
+            }
+
+            cleanMap()
+
+            var marker = new google.maps.Marker({
+                map: map
+            });
+
+            var select = document.getElementById('vehicle-select');
+            var intervalId;
+            var vehicleId = null;
+
+            select.addEventListener('change', function () {
+                clearInterval(intervalId);  // Detener la actualización automática al cambiar la selección
+                vehicleId = select.value;
+                if (select.value !== null && select.value !== '') {
+                    updateVehicleLocation(vehicleId);
+                } else {
+                    cleanMap()
+                }
+            });
+
+
+            intervalId = setInterval(function () {
+                if (vehicleId !== null && vehicleId !== '') {
+                    updateVehicleLocation(vehicleId);
+                }
+            }, 10000);  // Actualizar cada 10 segundos
+
+            function updateVehicleLocation(vehicleId) {
+                fetch(`/api/tracking/getLatestTracking/?id=${vehicleId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        var latitude = parseFloat(data.latitude);
+                        var longitude = parseFloat(data.longitude);
+                        marker.setPosition({lat: latitude, lng: longitude});
+                        map.setCenter({lat: latitude, lng: longitude});
+                    });
+            }
+        }
+    </script>
+</head>
+<body class="app">
+<nav aria-label="Breadcrumbs">
+
+    <div class="breadcrumbs">
+        <a href="/admin/">Home</a>
+        › <a href="/admin/vehicle/">Vehicle</a>
+        › <a href="/admin/vehicle/vehicle/">Catálogo</a>
+        › <a href="/api/vehicle/map/">Mapa</a>
+    </div>
+
+</nav>
+<!-- Contenido principal -->
+<main id="content">
+    <h1>Vehicle Map</h1>
+    <div>
+        <label for="vehicle-select">Selecciona un vehiculo:</label>
+        <select id="vehicle-select">
+            <option value="">Seleccione una opción</option>
+            {% for vehicle in vehicles %}
+            <option value="{{ vehicle.id }}">{{ vehicle.plates }}</option>
+            {% endfor %}
+        </select>
+        <br>
+    </div>
+    <br>
+    <div id="map"></div>
+</main>
+
+<script>
+    initMap();
+</script>
+</body>
+</html>

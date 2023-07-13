@@ -1,0 +1,6 @@
+{% extends 'admin/index.html' %}
+
+{% block content %}
+    {{ block.super }}
+    <a href="{% url 'vehicle_map' %}" class="btn btn-primary">Go to Vehicle Map</a>
+{% endblock %}
