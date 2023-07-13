@@ -72,11 +72,11 @@
             });
 
 
-            intervalId = setInterval(function () {
+            setInterval(function() {
                 if (vehicleId !== null && vehicleId !== '') {
                     updateVehicleLocation(vehicleId);
                 }
-            }, 10000);  // Actualizar cada 10 segundos
+            }, 10000);// Actualizar cada 10 segundos
 
             function updateVehicleLocation(vehicleId) {
                 fetch(`/api/tracking/getLatestTracking/?id=${vehicleId}`)
