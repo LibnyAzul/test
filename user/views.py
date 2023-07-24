@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -273,6 +274,7 @@ class AddOrEdit(UserVerification, APIView):
                                  'Message': f'{field.capitalize()} is required'}, status=400)
 
         is_superuser = data.get('is_superuser', False)
+
         user = None
         if is_superuser:
             # Crear un nuevo superusuario
@@ -288,6 +290,7 @@ class AddOrEdit(UserVerification, APIView):
             if field in data:
                 setattr(user, field, data[field])
 
+        user.is_staff = data.get('is_staff', False)
         user.createdBy = user_session.data['name']
         user.lastModifiedBy = user_session.data['name']
 

@@ -85,7 +85,7 @@ class GetLatestTracking(UserVerification, APIView):
                 tracking = Tracking.objects.filter(vehicle=vehicle).order_by('-createdDate').first()
                 if tracking is None:
                     return Response({'Error': 'ER-TRACKING-000',
-                                     'Message': 'No hay registro de seguimiento para el vehículo especificado'}, status=404)
+                                     'Message': 'No hay registro de seguimiento para el vehículo especificado'}, status=200)
 
                 # Serializar el objeto de seguimiento
                 serializer = TrackingDetailSerializers(tracking)

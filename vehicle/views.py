@@ -27,8 +27,18 @@ class VehiclesView(UserVerification, ListAPIView):
     def post(self, request, format=None):
         # Obtener los datos de la solicitud
         data = self.request.data
+        if request.user.is_superuser:
+            # Si el usuario es un superusuario, obtener todos los vehículos
+            vehicles = Vehicle.objects.all()
+        elif request.user.is_staff:
+            # Si el usuario es un miembro del personal, obtener los vehículos asociados a ese usuario
+            vehicles = Vehicle.objects.filter(users=request.user)
+        else:
+            # Si el usuario no es un superusuario ni un miembro del personal, no tiene acceso a ningún vehículo
+            vehicles = []
+
         # Filtrar los datos de acuerdo a los parámetros proporcionados
-        queryset = CustomFilter.custom_filter(self, data, Vehicle.objects.all())
+        queryset = CustomFilter.custom_filter(self, data, vehicles)
         # Paginar los resultados
         response = CustomPagination.paginate(self, viewName, data, queryset)
         # Devolver la respuesta paginada
